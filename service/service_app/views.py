@@ -3,13 +3,12 @@ from django.db.models import Sum
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from service.service_app.models import Customer, Product, Order, OrderItem
-from serializers import CustomerListSerializer, CustomerSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer
+from .models import Customer, Product, Order, OrderItem
+from .serializers import CustomerListSerializer, CustomerSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer
 
 
 class CustomerAPIView(APIView):
     def get(self, request):
-        print("CUSTOMER LIST VIEW CALLED")
         customers = Customer.objects.all()
         serializer = CustomerListSerializer(customers, many=True)
         return Response(serializer.data)
@@ -121,9 +120,11 @@ class OrderDetailAPIView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         items = OrderItem.objects.filter(order_id=pk)
+        items_data = OrderItemSerializer(items, many=True).data
         total_price = sum(item.quantity * item.price_at_order for item in items)
 
         order_details = OrderSerializer(order).data
+        order_details['items'] = items_data # добавили поле со списком товаров в заказе
         order_details['total_price'] = total_price # добавили поле total_price
         return Response(order_details)
 
@@ -163,13 +164,13 @@ class OrderItemsAPIView(APIView):
 
         order_item = serializer.save(order=order)
 
+        order.save() # чтобы обновилось поле updated_at
+
         if order.status == 'paid':
             product.stock -= quantity
             product.save()
 
         return Response(OrderItemSerializer(order_item).data)
-
-
 
 
 

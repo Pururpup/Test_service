@@ -4,7 +4,7 @@ from django.db import models
 class Customer(models.Model):
     name = models.CharField()
     email = models.EmailField()
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Product(models.Model):
@@ -22,8 +22,8 @@ class Order(models.Model):
     ]
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     status = models.CharField(choices=STATUS_CHOICES)
-    created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 # товар в заказе
