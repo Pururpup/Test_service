@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "test_service"
+version = "0.1.0"
+description = ""
+authors = ["victoria"]
+
+[tool.poetry.dependencies]
+python = ">=3.12"
+gunicorn = "^23.0.0"
+django = "^6.0"
+psycopg2 = "^2.9.11"
+djangorestframework = "^3.16.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
