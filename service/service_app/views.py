@@ -3,7 +3,7 @@ from django.db.models import Sum
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from models import Customer, Product, Order, OrderItem
+from service.service_app.models import Customer, Product, Order, OrderItem
 from serializers import CustomerListSerializer, CustomerSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer
 
 
