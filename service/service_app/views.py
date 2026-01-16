@@ -1,6 +1,6 @@
 from django.core.serializers import serialize
 from django.db.models import Sum
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Customer, Product, Order, OrderItem
@@ -32,57 +32,9 @@ class CustomerDetailAPIView(APIView):
         return Response(serializer.data)
 
 
-class ProductAPIView(APIView):
-    def get(self, request):
-        products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = ProductSerializer(data=request.data)
-
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    def put(self, request):
-        product_id = request.data.get('id')
-
-        try:
-            product = Product.objects.get(pk=product_id)
-        except Product.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        serializer = ProductSerializer(product, data=request.data)
-
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    def patch(self, request):
-        product_id = request.data.get('id')
-
-        try:
-            product = Product.objects.get(pk=product_id)
-        except Product.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        serializer = ProductSerializer(product, data=request.data, partial=True)
-
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    def delete(self, request):
-        product_id = request.data.get('id')
-
-        try:
-            product = Product.objects.get(pk=product_id)
-        except Product.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 
 class OrderAPIView(APIView):
@@ -124,8 +76,11 @@ class OrderDetailAPIView(APIView):
         total_price = sum(item.quantity * item.price_at_order for item in items)
 
         order_details = OrderSerializer(order).data
+
         order_details['items'] = items_data # добавили поле со списком товаров в заказе
         order_details['total_price'] = total_price # добавили поле total_price
+        # написать сериализатор для новых полей заказа, которые формируются динамически
+
         return Response(order_details)
 
 
@@ -137,8 +92,10 @@ class OrderStatusAPIView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         new_status = request.data.get('status')
+
         if new_status not in dict(Order.STATUS_CHOICES):
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        # создать новый сериализатор для этой проверки
 
         order.status = new_status
         order.save()
