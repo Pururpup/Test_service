@@ -4,32 +4,12 @@ from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Customer, Product, Order, OrderItem
-from .serializers import CustomerListSerializer, CustomerSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer
+from .serializers import CustomerSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer
 
 
-class CustomerAPIView(APIView):
-    def get(self, request):
-        customers = Customer.objects.all()
-        serializer = CustomerListSerializer(customers, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = CustomerSerializer(data=request.data)
-
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-
-class CustomerDetailAPIView(APIView):
-    def get(self, request, pk):
-        try:
-            customer = Customer.objects.get(pk=pk)
-        except Customer.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        serializer = CustomerSerializer(customer)
-        return Response(serializer.data)
+class CustomerViewSet(viewsets.ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):

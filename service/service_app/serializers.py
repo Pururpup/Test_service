@@ -3,12 +3,6 @@ from rest_framework.serializers import ModelSerializer
 from .models import Customer, Product, Order, OrderItem
 
 
-class CustomerListSerializer(ModelSerializer):
-    class Meta:
-        model = Customer
-        fields = ['id', 'name']
-
-
 class CustomerSerializer(ModelSerializer):
     class Meta:
         model = Customer

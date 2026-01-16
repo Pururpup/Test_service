@@ -18,22 +18,20 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from service_app.views import CustomerAPIView, CustomerDetailAPIView, OrderAPIView, OrderDetailAPIView, \
-    OrderStatusAPIView, OrderItemsAPIView, ProductViewSet
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/customers/', CustomerAPIView.as_view()),
-    path('api/customers/<int:pk>/', CustomerDetailAPIView.as_view()),
-    path('api/orders/', OrderAPIView.as_view()),
-    path('api/orders/<int:pk>/', OrderDetailAPIView.as_view()),
-    path('api/orders/<int:pk>/status/', OrderStatusAPIView.as_view()),
-    path('api/orders/<int:pk>/items/', OrderItemsAPIView.as_view()),
-]
+from service_app.views import OrderAPIView, OrderDetailAPIView, \
+    OrderStatusAPIView, OrderItemsAPIView, ProductViewSet, CustomerViewSet
 
 router = DefaultRouter()
 router.register(r'products', ProductViewSet)
+router.register(r'customers', CustomerViewSet)
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/orders/<int:pk>/status/', OrderStatusAPIView.as_view()),
+    path('api/orders/<int:pk>/items/', OrderItemsAPIView.as_view()),
+    path('api/orders/<int:pk>/', OrderDetailAPIView.as_view()),
+    path('api/orders/', OrderAPIView.as_view()),
+
     path('api/', include(router.urls)),
+
 ]
