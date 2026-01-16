@@ -171,14 +171,3 @@ class OrderItemsAPIView(APIView):
             product.save()
 
         return Response(OrderItemSerializer(order_item).data)
-
-
-
-
-
-
-
-
-
-
-
