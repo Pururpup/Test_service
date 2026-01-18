@@ -68,25 +68,18 @@ class OrderStatusAPIView(APIView):
 
 class OrderItemsAPIView(APIView):
     def post(self, request, pk):
-        try:
-            order = Order.objects.get(pk=pk)
-        except Order.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        order = get_object_or_404(Order, pk=pk)
 
         serializer = OrderItemSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        product = serializer.validated_data['product']
-        quantity = serializer.validated_data['quantity']
-        if product.stock < quantity:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         order_item = serializer.save(order=order)
 
         order.save() # чтобы обновилось поле updated_at
 
         if order.status == 'paid':
-            product.stock -= quantity
+            product = order_item.product
+            product.stock -= order_item.quantity
             product.save()
 
         return Response(OrderItemSerializer(order_item).data)

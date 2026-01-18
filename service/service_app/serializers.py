@@ -47,3 +47,12 @@ class OrderItemSerializer(ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['product', 'quantity', 'price_at_order']
+
+    def validate(self, data):
+        product = data['product']
+        quantity = data['quantity']
+
+        if product.stock < quantity:
+            raise serializers.ValidationError('На складе недостаточно товара')
+
+        return data
