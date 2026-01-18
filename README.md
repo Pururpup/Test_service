@@ -78,6 +78,7 @@ POSTGRES_PORT=5432
 
 
 ## Структура проекта
+```markdown
 Test_service/
 ├── service/
 │   ├── service/    # настройки Django
@@ -105,6 +106,7 @@ Test_service/
 ├── poetry.lock
 ├── pyproject.toml
 └── README.md
+```
 
 
 ## Примеры использования API
