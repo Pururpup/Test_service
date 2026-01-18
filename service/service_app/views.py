@@ -49,6 +49,7 @@ class OrderAPIView(APIView):
 class OrderDetailAPIView(APIView):
     def get(self, request, pk):
         order = get_object_or_404(Order, pk=pk)
+
         serializer = OrderDetailSerializer(order)
 
         return Response(serializer.data)
@@ -72,7 +73,6 @@ class OrderItemsAPIView(APIView):
 
         serializer = OrderItemSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         order_item = serializer.save(order=order)
 
         order.save() # чтобы обновилось поле updated_at
