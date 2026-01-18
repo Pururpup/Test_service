@@ -1,10 +1,11 @@
+from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Customer, Product, Order, OrderItem
 from .serializers import CustomerSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer, \
-    OrderDetailSerializer
+    OrderDetailSerializer, OrderStatusSerializer
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -41,6 +42,7 @@ class OrderAPIView(APIView):
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
         return Response(serializer.data)
 
 
@@ -48,26 +50,19 @@ class OrderDetailAPIView(APIView):
     def get(self, request, pk):
         order = get_object_or_404(Order, pk=pk)
         serializer = OrderDetailSerializer(order)
+
         return Response(serializer.data)
 
 
 class OrderStatusAPIView(APIView):
     def patch(self, request, pk):
-        try:
-            order = Order.objects.get(pk=pk)
-        except Order.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        order = get_object_or_404(Order, pk=pk)
 
-        new_status = request.data.get('status')
+        serializer = OrderStatusSerializer(order, data=request.data, partial=True)
 
-        if new_status not in dict(Order.STATUS_CHOICES):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        # создать новый сериализатор для этой проверки
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        order.status = new_status
-        order.save()
-
-        serializer = OrderSerializer(order)
         return Response(serializer.data)
 
 

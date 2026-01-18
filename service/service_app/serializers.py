@@ -37,6 +37,12 @@ class OrderDetailSerializer(OrderSerializer):
         return total_price
 
 
+class OrderStatusSerializer(ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['status',]
+
+
 class OrderItemSerializer(ModelSerializer):
     class Meta:
         model = OrderItem
