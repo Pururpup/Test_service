@@ -1,10 +1,10 @@
-from django.core.serializers import serialize
-from django.db.models import Sum
+from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Customer, Product, Order, OrderItem
-from .serializers import CustomerSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer
+from .serializers import CustomerSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer, \
+    OrderDetailSerializer
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -46,22 +46,9 @@ class OrderAPIView(APIView):
 
 class OrderDetailAPIView(APIView):
     def get(self, request, pk):
-        try:
-            order = Order.objects.get(pk=pk)
-        except Order.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        items = OrderItem.objects.filter(order_id=pk)
-        items_data = OrderItemSerializer(items, many=True).data
-        total_price = sum(item.quantity * item.price_at_order for item in items)
-
-        order_details = OrderSerializer(order).data
-
-        order_details['items'] = items_data # добавили поле со списком товаров в заказе
-        order_details['total_price'] = total_price # добавили поле total_price
-        # написать сериализатор для новых полей заказа, которые формируются динамически
-
-        return Response(order_details)
+        order = get_object_or_404(Order, pk=pk)
+        serializer = OrderDetailSerializer(order)
+        return Response(serializer.data)
 
 
 class OrderStatusAPIView(APIView):

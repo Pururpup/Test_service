@@ -22,6 +22,21 @@ class OrderSerializer(ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 
+class OrderDetailSerializer(OrderSerializer):
+    list_items = serializers.SerializerMethodField()
+    total_price = serializers.SerializerMethodField()
+
+    def get_list_items(self, obj):
+        items = OrderItem.objects.filter(order_id=obj.pk)
+        list_items = OrderItemSerializer(items, many=True).data
+        return list_items
+
+    def get_total_price(self, obj):
+        items = OrderItem.objects.filter(order_id=obj.pk)
+        total_price = sum(item.quantity * item.price_at_order for item in items)
+        return total_price
+
+
 class OrderItemSerializer(ModelSerializer):
     class Meta:
         model = OrderItem
