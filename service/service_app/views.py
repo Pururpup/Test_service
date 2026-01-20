@@ -1,3 +1,5 @@
+from django.contrib.admin.templatetags.admin_list import pagination
+from django.core.paginator import Paginator
 from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
@@ -34,8 +36,15 @@ class OrderAPIView(APIView):
         if filter_created_at:
             orders = orders.filter(created_at=filter_created_at)
 
-        serializer = OrderSerializer(orders, many=True)
+        # pagination
+        page_size = int(request.query_params.get('page_size', 3)) # размер страницы
+        page_number = int(request.query_params.get('page_number', 1)) # номер страницы
+        paginator = Paginator(orders, page_size)
+
+        serializer = OrderSerializer(paginator.get_page(page_number), many=True)
+
         return Response(serializer.data)
+
 
     def post(self, request):
         serializer = OrderSerializer(data=request.data)
