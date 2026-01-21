@@ -36,8 +36,8 @@
 
 Клонируйте репозиторий:
 ```bash
-git clone https://github.com/Pururpup/Test_service
-cd Test_service
+git clone https://github.com/Pururpup/OrderService
+cd OrderService
 ```
 
 

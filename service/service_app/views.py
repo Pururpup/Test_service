@@ -1,12 +1,9 @@
-from django.contrib.admin.templatetags.admin_list import pagination
-from django.core.paginator import Paginator
-from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Customer, Product, Order, OrderItem
+from .models import Customer, Product, Order
 from .serializers import CustomerSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer, \
     OrderDetailSerializer, OrderStatusSerializer
 
@@ -49,6 +46,11 @@ class OrderAPIView(APIView):
         # pagination
         paginator = CustomPagination()
         page = paginator.paginate_queryset(orders, request, view=self)
+        # page возвращает список объектов для текущей страницы
+
+        # orders - список, для которого пагинация применяется
+        # request - чтение параметров page и page_size (page=1 по умолчанию, а page_size берется из CustomPagination)
+        # view=self - ссылка на текущее APIView для формирования ссылки next/previous
 
         serializer = OrderSerializer(page, many=True)
 
