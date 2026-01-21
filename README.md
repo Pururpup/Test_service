@@ -79,15 +79,15 @@ POSTGRES_PORT=5432
 
 ## Структура проекта
 ```markdown
-Test_service/           # OrderService
-├── service/            # backend
-│   ├── service/        # config 
+OrderService/
+├── backend/
+│   ├── config/
 │   │   ├── __init__.py
 │   │   ├── asgi.py
 │   │   ├── settings.py
 │   │   ├── urls.py
 │   │   └── wsgi.py
-│   ├── service_app/    # app
+│   ├── service_app/
 │   │   ├── migrations/
 │   │   │   └── __init__.py
 │   │   ├── __init__.py
