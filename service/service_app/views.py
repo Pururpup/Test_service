@@ -3,6 +3,7 @@ from django.core.paginator import Paginator
 from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Customer, Product, Order, OrderItem
@@ -10,14 +11,23 @@ from .serializers import CustomerSerializer, ProductSerializer, OrderSerializer,
     OrderDetailSerializer, OrderStatusSerializer
 
 
+# paginator
+class CustomPagination(PageNumberPagination):
+    page_size = 3 # размер страницы по умолчанию
+    page_size_query_param = 'page_size'
+    max_page_size = 50
+
+
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    pagination_class = CustomPagination
 
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    pagination_class = CustomPagination
 
 
 class OrderAPIView(APIView):
@@ -37,13 +47,12 @@ class OrderAPIView(APIView):
             orders = orders.filter(created_at=filter_created_at)
 
         # pagination
-        page_size = int(request.query_params.get('page_size', 3)) # размер страницы
-        page_number = int(request.query_params.get('page_number', 1)) # номер страницы
-        paginator = Paginator(orders, page_size)
+        paginator = CustomPagination()
+        page = paginator.paginate_queryset(orders, request, view=self)
 
-        serializer = OrderSerializer(paginator.get_page(page_number), many=True)
+        serializer = OrderSerializer(page, many=True)
 
-        return Response(serializer.data)
+        return paginator.get_paginated_response(serializer.data)
 
 
     def post(self, request):
