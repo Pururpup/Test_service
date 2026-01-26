@@ -22,6 +22,6 @@ RUN poetry install --no-root --no-interaction --no-ansi
 
 COPY . /app
 
-WORKDIR /app/service
+WORKDIR /app/backend
 
-ENTRYPOINT ["gunicorn", "service.wsgi:application", "--bind", "0.0.0.0:8000"]
+ENTRYPOINT ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
