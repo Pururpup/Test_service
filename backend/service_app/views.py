@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,20 +16,20 @@ class CustomPagination(PageNumberPagination):
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.all()
+    queryset = Customer.objects.all().order_by('pk')
     serializer_class = CustomerSerializer
     pagination_class = CustomPagination
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('pk')
     serializer_class = ProductSerializer
     pagination_class = CustomPagination
 
 
 class OrderAPIView(APIView):
     def get(self, request):
-        orders = Order.objects.all()
+        orders = Order.objects.all().order_by('pk')
 
         filter_status = request.query_params.get('status')
         if filter_status:
@@ -63,7 +63,7 @@ class OrderAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class OrderDetailAPIView(APIView):
@@ -102,4 +102,4 @@ class OrderItemsAPIView(APIView):
             product.stock -= order_item.quantity
             product.save()
 
-        return Response(OrderItemSerializer(order_item).data)
+        return Response(OrderItemSerializer(order_item).data, status=status.HTTP_201_CREATED)
