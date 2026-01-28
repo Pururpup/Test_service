@@ -22,15 +22,15 @@ from service_app.views import OrderAPIView, OrderDetailAPIView, \
     OrderStatusAPIView, OrderItemsAPIView, ProductViewSet, CustomerViewSet
 
 router = DefaultRouter()
-router.register(r'products', ProductViewSet)
-router.register(r'customers', CustomerViewSet)
+router.register(r'products', ProductViewSet, basename='products')
+router.register(r'customers', CustomerViewSet, basename='customers')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/orders/<int:pk>/status/', OrderStatusAPIView.as_view()),
-    path('api/orders/<int:pk>/items/', OrderItemsAPIView.as_view()),
+    path('api/orders/<int:pk>/status/', OrderStatusAPIView.as_view(), name='orders-status'),
+    path('api/orders/<int:pk>/items/', OrderItemsAPIView.as_view(), name='orders-item'),
     path('api/orders/<int:pk>/', OrderDetailAPIView.as_view()),
-    path('api/orders/', OrderAPIView.as_view()),
+    path('api/orders/', OrderAPIView.as_view(), name='orders-list'),
 
     path('api/', include(router.urls)),
 
