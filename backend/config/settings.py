@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+import sys
 from pathlib import Path
+
+from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'service_app',
     'rest_framework',
+    'django_celery_results',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -131,4 +136,36 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 3,
+}
+
+
+# Детекция запущено ли сейчас тестирование
+TESTING = 'test' in sys.argv
+TESTING = TESTING or 'test_coverage' in sys.argv or 'pytest' in sys.modules
+
+# Настройки celery
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+CELERY_TASK_ALWAYS_EAGER = TESTING
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
+CELERY_RESULT_EXTENDED = True
+CELERY_TASK_TRACK_STARTED = True
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+
+from kombu import Queue
+
+# Очереди задач с разными приоритетами
+CELERY_TASK_QUEUES = (
+    Queue("high", routing_key="high"),
+    Queue("default", routing_key="default"),
+)
+
+CELERY_TASK_DEFAULT_QUEUE = "default"
+
+# Настройка маршрутизации задач
+CELERY_TASK_ROUTES = {
+    "service_app.tasks.update_example_name": {"queue": "high"},
+    "service_app.tasks.very_long_task": {"queue": "default"},
+    "service_app.tasks.debug_task": {"queue": "default"},
 }
