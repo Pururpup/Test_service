@@ -12,6 +12,7 @@ services:
       - db
 
   redis:
+    container_name: redis
     image: "redis"
     ports:
       - "6379:6379"
@@ -25,6 +26,28 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+
+  worker:
+    build:
+      context: .
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+      - db
+      - web
+    command: celery -A config.celery.app worker --loglevel=info
+
+  beat:
+    build:
+      context: .
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+      - db
+      - web
+    command: celery -A config.celery.app beat --loglevel=info
 
 volumes:
   postgres_data:
