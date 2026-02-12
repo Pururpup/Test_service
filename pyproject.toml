@@ -5,13 +5,17 @@ description = ""
 authors = ["victoria"]
 
 [tool.poetry.dependencies]
-python = ">=3.12"
+python = ">=3.12,<4.0"
 gunicorn = "^23.0.0"
-django = "^6.0"
+django = ">=4.2,<6.0"
 psycopg2 = "^2.9.11"
 djangorestframework = "^3.16.1"
 celery = "^5.6.2"
 redis = "^7.1.0"
+kombu = "^5.6.2"
+django-celery-results = "^2.6.0"
+flower = "^2.0.1"
+django-celery-beat = "^2.8.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0"
