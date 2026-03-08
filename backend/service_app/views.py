@@ -1,4 +1,6 @@
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from minio_storage import MinioMediaStorage
 from rest_framework import viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
@@ -6,6 +8,7 @@ from rest_framework.response import Response
 from .models import Customer, Product, Order
 from .serializers import CustomerSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer, \
     OrderDetailSerializer, OrderStatusSerializer
+from .tasks import order_statistics
 
 
 # paginator
@@ -103,3 +106,15 @@ class OrderItemsAPIView(APIView):
             product.save()
 
         return Response(OrderItemSerializer(order_item).data, status=status.HTTP_201_CREATED)
+
+
+def get_order_statistics(request):
+    storage = MinioMediaStorage()
+    file_name = 'order_statistics.xlsx'
+
+    if storage.exists(file_name):
+        return JsonResponse({"url": f"http://localhost:9000/media/{file_name}"})
+
+    order_statistics.delay()
+    return JsonResponse({"status": "processing"})
+
