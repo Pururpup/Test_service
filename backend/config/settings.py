@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_celery_results',
     'django_celery_beat',
+    'minio_storage',
 ]
 
 MIDDLEWARE = [
@@ -169,3 +170,11 @@ CELERY_TASK_ROUTES = {
     "service_app.tasks.very_long_task": {"queue": "default"},
     "service_app.tasks.debug_task": {"queue": "default"},
 }
+
+# Настройки django-minio-storage
+DEFAULT_FILE_STORAGE = "minio_storage.storage.MinioMediaStorage"
+MINIO_STORAGE_ENDPOINT = os.getenv('MINIO_STORAGE_ENDPOINT')
+MINIO_STORAGE_ACCESS_KEY = os.getenv('MINIO_ROOT_USER')
+MINIO_STORAGE_SECRET_KEY = os.getenv('MINIO_ROOT_PASSWORD')
+MINIO_STORAGE_MEDIA_BUCKET_NAME = os.getenv('MINIO_STORAGE_MEDIA_BUCKET_NAME')
+MINIO_STORAGE_USE_HTTPS = False
