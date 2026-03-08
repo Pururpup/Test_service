@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from celery import Celery
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
@@ -16,5 +17,10 @@ app.conf.beat_schedule = {
     "delete_cancelled_orders": {
         "task": "service_app.tasks.delete_cancelled_orders",
         "schedule": 60.0,
+    },
+
+    "order_statistics": {
+        "task": "service_app.tasks.order_statistics",
+        "schedule": timedelta(hours=1)
     },
 }

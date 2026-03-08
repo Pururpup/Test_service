@@ -19,7 +19,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from service_app.views import OrderAPIView, OrderDetailAPIView, \
-    OrderStatusAPIView, OrderItemsAPIView, ProductViewSet, CustomerViewSet
+    OrderStatusAPIView, OrderItemsAPIView, ProductViewSet, CustomerViewSet, get_order_statistics
 
 router = DefaultRouter()
 router.register(r'products', ProductViewSet, basename='products')
@@ -33,5 +33,7 @@ urlpatterns = [
     path('api/orders/', OrderAPIView.as_view(), name='orders-list'),
 
     path('api/', include(router.urls)),
+
+    path('order-statistics/', get_order_statistics)
 
 ]
